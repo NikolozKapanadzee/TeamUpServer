@@ -7,6 +7,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -19,7 +20,7 @@ export class UsersController {
     return this.UsersService.getAllUsers();
   }
   @Get(':id')
-  getUserById(@Param('id') id) {
+  getUserById(@Param('id', ParseIntPipe) id) {
     console.log(id, 'id');
     return this.UsersService.getUserById(Number(id));
   }
@@ -30,11 +31,14 @@ export class UsersController {
     return this.UsersService.createUser({ email, password });
   }
   @Delete(':id')
-  deleteUserById(@Param('id') id) {
+  deleteUserById(@Param('id', ParseIntPipe) id) {
     return this.UsersService.deleteUserById(Number(id));
   }
   @Put(':id')
-  updateUserById(@Param('id') id, @Body() UpdateUserDto: UpdateUserDto) {
+  updateUserById(
+    @Param('id', ParseIntPipe) id,
+    @Body() UpdateUserDto: UpdateUserDto,
+  ) {
     return this.UsersService.updateUserById(Number(id), UpdateUserDto);
   }
 }

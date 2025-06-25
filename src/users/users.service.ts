@@ -25,6 +25,10 @@ export class UsersService {
     return this.users;
   }
   getUserById(id) {
+    const index = this.users.findIndex((el) => el.id === id);
+    if (index === -1) {
+      throw new NotFoundException('user not found');
+    }
     const user = this.users.find((el) => el.id === id);
     return user;
   }
