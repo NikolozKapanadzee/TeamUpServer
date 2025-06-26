@@ -1,6 +1,7 @@
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -24,6 +25,10 @@ export class UsersService {
   }
   async createUser(createUserDto: CreateUserDto) {
     const { email, password } = createUserDto;
+    const existUser = await this.userModel.findOne({ email });
+    if (existUser) {
+      throw new BadRequestException('email already exists');
+    }
     if (!email || !password) {
       throw new HttpException(
         'email and password are required',
