@@ -7,38 +7,30 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
-
 @Controller('users')
 export class UsersController {
-  constructor(private UsersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) {}
   @Get()
   getAllUsers() {
-    return this.UsersService.getAllUsers();
+    return this.usersService.getAllUsers();
   }
   @Get(':id')
-  getUserById(@Param('id', ParseIntPipe) id) {
-    console.log(id, 'id');
-    return this.UsersService.getUserById(Number(id));
+  getUserById(@Param('id') id) {
+    return this.usersService.getUserById(id);
   }
   @Post()
-  createUser(@Body() CreateUserDto: CreateUserDto) {
-    const email = CreateUserDto?.email;
-    const password = CreateUserDto?.password;
-    return this.UsersService.createUser({ email, password });
+  createUser(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.createUser(createUserDto);
   }
   @Delete(':id')
-  deleteUserById(@Param('id', ParseIntPipe) id) {
-    return this.UsersService.deleteUserById(Number(id));
+  deleteUserById(@Param('id') id) {
+    return this.usersService.deleteUserById(id);
   }
   @Put(':id')
-  updateUserById(
-    @Param('id', ParseIntPipe) id,
-    @Body() UpdateUserDto: UpdateUserDto,
-  ) {
-    return this.UsersService.updateUserById(Number(id), UpdateUserDto);
+  updateUserById(@Param('id') id, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.updateUserById(id, updateUserDto);
   }
 }
