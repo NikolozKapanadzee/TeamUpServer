@@ -13,6 +13,6 @@ export class AuthController {
   }
   @Post('sign-in')
   signIn(@Body() SignInDto: SignInDto) {
-    return;
+    return this.authService.signIn(SignInDto);
   }
 }

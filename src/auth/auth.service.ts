@@ -6,10 +6,14 @@ import { Model } from 'mongoose';
 
 import * as bcrypt from 'bcrypt';
 import { SignInDto } from './dto/sign-in.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    private jwtService: JwtService,
+  ) {}
   async signUp({ email, password }: SignUpDto) {
     const existUser = await this.userModel.findOne({ email });
     if (existUser) {
@@ -35,5 +39,10 @@ export class AuthService {
     if (!isPasswordEqual) {
       throw new BadRequestException('Invalid credentials');
     }
+    const payload = {
+      id: existUser._id,
+    };
+    const token = this.jwtService.sign(payload, { expiresIn: '1h' });
+    return { token };
   }
 }
