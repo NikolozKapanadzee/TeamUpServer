@@ -24,7 +24,6 @@ export class AuthService {
       email,
       password: hashedPassword,
     });
-
     return { message: 'sign up passed successfully', data: newUser };
   }
 
