@@ -41,7 +41,21 @@ export class PostsService {
   }
 
   async update(id: string, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+    const updatedPost = await this.postModel.findByIdAndUpdate(
+      id,
+      updatePostDto,
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+    if (!updatedPost) {
+      throw new NotFoundException('post not found');
+    }
+    return {
+      message: 'post successfully updated',
+      user: updatedPost,
+    };
   }
 
   async remove(id: string) {
