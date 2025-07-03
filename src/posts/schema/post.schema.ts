@@ -14,10 +14,10 @@ export class Post {
   })
   description: string;
   @Prop({
-    type: String,
+    type: Object,
     required: true,
   })
-  lookfor: string[];
+  lookfor: Record<string, string>;
   @Prop({
     type: String,
     required: true,

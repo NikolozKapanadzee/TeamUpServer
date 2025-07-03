@@ -1,4 +1,10 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsDefined,
+  IsEmail,
+  IsNotEmpty,
+  IsObject,
+  IsString,
+} from 'class-validator';
 
 export class CreatePostDto {
   @IsString()
@@ -7,9 +13,10 @@ export class CreatePostDto {
   @IsString()
   @IsNotEmpty()
   description: string;
-  @IsString()
+  @IsDefined()
   @IsNotEmpty()
-  lookfor: string;
+  @IsObject()
+  lookfor: Record<string, string>;
   @IsEmail()
   @IsNotEmpty()
   contact: string;
