@@ -8,11 +8,15 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { Model } from 'mongoose';
 import { Post } from './schema/post.schema';
 import { InjectModel } from '@nestjs/mongoose';
+import { User } from 'src/users/schema/users.schema';
 
 @Injectable()
 export class PostsService {
-  constructor(@InjectModel(Post.name) private postModel: Model<Post>) {}
-  async create(createPostDto: CreatePostDto) {
+  constructor(
+    @InjectModel(Post.name) private postModel: Model<Post>,
+    @InjectModel(User.name) private userModel: Model<User>,
+  ) {}
+  async create(createPostDto: CreatePostDto, userId: string) {
     const { title, description, lookfor, contact } = createPostDto;
     if (!title || !description || !lookfor || !contact) {
       throw new BadRequestException('all fields are required');
@@ -22,9 +26,19 @@ export class PostsService {
       description,
       lookfor,
       contact,
+      author: userId,
     });
+
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      userId,
+      { $push: { posts: createdPost._id } },
+      { new: true },
+    );
+    if (!updatedUser) {
+      throw new NotFoundException('User not found');
+    }
     return {
-      message: 'post successfully created',
+      message: 'Post successfully created',
       post: createdPost,
     };
   }
@@ -54,7 +68,7 @@ export class PostsService {
     }
     return {
       message: 'post successfully updated',
-      user: updatedPost,
+      post: updatedPost,
     };
   }
 
