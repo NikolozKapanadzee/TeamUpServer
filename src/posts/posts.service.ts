@@ -77,6 +77,11 @@ export class PostsService {
     if (!post) {
       throw new NotFoundException('post not found');
     }
+    await this.userModel.findByIdAndUpdate(
+      post.author,
+      { $pull: { posts: post._id } },
+      { new: true },
+    );
     return { message: 'post successfully deleted', post: post };
   }
 }
