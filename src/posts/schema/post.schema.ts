@@ -23,6 +23,11 @@ export class Post {
     required: true,
   })
   contact: string;
+  @Prop({
+    type: String,
+    default: 'Remote',
+  })
+  city: string;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,

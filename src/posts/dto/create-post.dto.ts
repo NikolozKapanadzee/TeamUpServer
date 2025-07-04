@@ -3,6 +3,7 @@ import {
   IsEmail,
   IsNotEmpty,
   IsObject,
+  IsOptional,
   IsString,
 } from 'class-validator';
 
@@ -20,4 +21,7 @@ export class CreatePostDto {
   @IsEmail()
   @IsNotEmpty()
   contact: string;
+  @IsString()
+  @IsOptional()
+  city: string;
 }

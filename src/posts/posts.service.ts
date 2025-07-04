@@ -17,7 +17,7 @@ export class PostsService {
     @InjectModel(User.name) private userModel: Model<User>,
   ) {}
   async create(createPostDto: CreatePostDto, userId: string) {
-    const { title, description, lookfor, contact } = createPostDto;
+    const { title, description, lookfor, contact, city } = createPostDto;
     if (!title || !description || !lookfor || !contact) {
       throw new BadRequestException('all fields are required');
     }
@@ -27,6 +27,7 @@ export class PostsService {
       lookfor,
       contact,
       author: userId,
+      city,
     });
 
     const updatedUser = await this.userModel.findByIdAndUpdate(
