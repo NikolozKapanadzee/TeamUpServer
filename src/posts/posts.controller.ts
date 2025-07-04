@@ -39,14 +39,14 @@ export class PostsController {
   findOne(@Param('id') id: string) {
     return this.postsService.findOne(id);
   }
-
+  @UseGuards(IsAuthGuard)
   @Put(':id')
   update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
     return this.postsService.update(id, updatePostDto);
   }
-
+  @UseGuards(IsAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postsService.remove(id);
+  remove(@Param('id') id: string, @UserId() userId: string) {
+    return this.postsService.remove(id, userId);
   }
 }

@@ -1,6 +1,7 @@
 import { FilterPostsDto } from './dto/filter-posts.dto';
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -126,19 +127,29 @@ export class PostsService {
     };
   }
 
-  async remove(id: string) {
+  async remove(id: string, userId: string) {
     if (!isValidObjectId(id)) {
       throw new BadRequestException('Invalid ID format');
     }
-    const post = await this.postModel.findByIdAndDelete(id);
+    const post = await this.postModel.findById(id);
+
     if (!post) {
-      throw new NotFoundException('post not found');
+      throw new NotFoundException('Post not found');
     }
+    console.log('userId:', userId);
+    console.log('post.author:', post.author.toString());
+    if (post.author.toString() !== userId.toString()) {
+      throw new ForbiddenException('You are not allowed to delete this post');
+    }
+    await this.postModel.findByIdAndDelete(id);
     await this.userModel.findByIdAndUpdate(
       post.author,
       { $pull: { posts: post._id } },
       { new: true },
     );
-    return { message: 'post successfully deleted', post: post };
+    return {
+      message: 'Post successfully deleted',
+      post,
+    };
   }
 }
