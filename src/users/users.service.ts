@@ -8,7 +8,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { isValidObjectId, Model } from 'mongoose';
 import { User } from './schema/users.schema';
 @Injectable()
 export class UsersService {
@@ -17,6 +17,9 @@ export class UsersService {
     return await this.userModel.find();
   }
   async getUserById(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid ID format');
+    }
     const user = await this.userModel.findById(id);
     if (!user) {
       throw new NotFoundException('user not found');
@@ -42,6 +45,9 @@ export class UsersService {
     };
   }
   async deleteUserById(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid ID format');
+    }
     const user = await this.userModel.findByIdAndDelete(id);
     if (!user) {
       throw new NotFoundException('user not found');
@@ -49,6 +55,9 @@ export class UsersService {
     return { message: 'user successfully deleted', user: user };
   }
   async updateUserById(id: string, updateUserDto: UpdateUserDto) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid ID format');
+    }
     const updatedUser = await this.userModel.findByIdAndUpdate(
       id,
       updateUserDto,

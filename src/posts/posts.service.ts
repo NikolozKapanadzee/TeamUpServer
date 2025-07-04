@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { Model } from 'mongoose';
+import { isValidObjectId, Model } from 'mongoose';
 import { Post } from './schema/post.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/users/schema/users.schema';
@@ -95,7 +95,10 @@ export class PostsService {
   }
 
   async findOne(id: string) {
-    const post = this.postModel.findById(id);
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid ID format');
+    }
+    const post = await this.postModel.findById(id);
     if (!post) {
       throw new NotFoundException('post not found');
     }
@@ -103,6 +106,9 @@ export class PostsService {
   }
 
   async update(id: string, updatePostDto: UpdatePostDto) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid ID format');
+    }
     const updatedPost = await this.postModel.findByIdAndUpdate(
       id,
       updatePostDto,
@@ -121,6 +127,9 @@ export class PostsService {
   }
 
   async remove(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid ID format');
+    }
     const post = await this.postModel.findByIdAndDelete(id);
     if (!post) {
       throw new NotFoundException('post not found');
