@@ -14,10 +14,24 @@ export class Post {
   })
   description: string;
   @Prop({
-    type: Object,
+    type: {
+      positions: {
+        type: [String],
+        required: true,
+        validate: {
+          validator: function (v: string[]) {
+            return v && v.length > 0;
+          },
+          message: 'At least one position is required',
+        },
+      },
+    },
     required: true,
+    _id: false,
   })
-  lookfor: Record<string, string>;
+  lookfor: {
+    positions: string[];
+  };
   @Prop({
     type: String,
     required: true,
@@ -28,7 +42,6 @@ export class Post {
     default: 'Remote',
   })
   city: string;
-
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',

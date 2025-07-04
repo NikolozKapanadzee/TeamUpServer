@@ -17,7 +17,9 @@ export class CreatePostDto {
   @IsDefined()
   @IsNotEmpty()
   @IsObject()
-  lookfor: Record<string, string>;
+  lookfor: {
+    positions: string[];
+  };
   @IsEmail()
   @IsNotEmpty()
   contact: string;

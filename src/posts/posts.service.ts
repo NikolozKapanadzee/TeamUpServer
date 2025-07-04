@@ -1,3 +1,4 @@
+import { FilterPostsDto } from './dto/filter-posts.dto';
 import {
   BadRequestException,
   Injectable,
@@ -45,6 +46,52 @@ export class PostsService {
   }
   async findAll() {
     return this.postModel.find();
+  }
+
+  async findWithFilters(FilterPostsDto: FilterPostsDto) {
+    const query: any = {};
+    if (FilterPostsDto.city) {
+      query.city = { $regex: FilterPostsDto.city, $options: 'i' };
+    }
+    if (FilterPostsDto.position) {
+      query.$or = [
+        {
+          'lookfor.position': {
+            $regex: FilterPostsDto.position,
+            $options: 'i',
+          },
+        },
+        {
+          'lookfor.positions': {
+            $elemMatch: {
+              $regex: FilterPostsDto.position,
+              $options: 'i',
+            },
+          },
+        },
+      ];
+    }
+    if (FilterPostsDto.timeFilter && FilterPostsDto.timeFilter !== 'anytime') {
+      const now = new Date();
+      let startDate;
+
+      switch (FilterPostsDto.timeFilter) {
+        case '24hrs':
+          startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+          break;
+        case 'week':
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          break;
+        case 'month':
+          startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          break;
+        default:
+          startDate = new Date(0);
+      }
+
+      query.createdAt = { $gte: startDate };
+    }
+    return this.postModel.find(query).sort({ createdAt: -1 });
   }
 
   async findOne(id: string) {
