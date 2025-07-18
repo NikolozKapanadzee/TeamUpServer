@@ -14,24 +14,10 @@ export class Post {
   })
   description: string;
   @Prop({
-    type: {
-      positions: {
-        type: [String],
-        required: true,
-        validate: {
-          validator: function (v: string[]) {
-            return v && v.length > 0;
-          },
-          message: 'At least one position is required',
-        },
-      },
-    },
+    type: [String],
     required: true,
-    _id: false,
   })
-  lookfor: {
-    positions: string[];
-  };
+  lookfor: string[];
   @Prop({
     type: String,
     required: true,

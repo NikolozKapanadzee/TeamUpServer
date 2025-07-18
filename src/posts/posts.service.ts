@@ -54,23 +54,12 @@ export class PostsService {
     if (FilterPostsDto.city) {
       query.city = { $regex: FilterPostsDto.city, $options: 'i' };
     }
-    if (FilterPostsDto.position) {
-      query.$or = [
-        {
-          'lookfor.position': {
-            $regex: FilterPostsDto.position,
-            $options: 'i',
-          },
+    if (FilterPostsDto.lookfor && FilterPostsDto.lookfor.length > 0) {
+      query.lookfor = {
+        $elemMatch: {
+          $in: FilterPostsDto.lookfor.map((item) => new RegExp(item, 'i')),
         },
-        {
-          'lookfor.positions': {
-            $elemMatch: {
-              $regex: FilterPostsDto.position,
-              $options: 'i',
-            },
-          },
-        },
-      ];
+      };
     }
     if (FilterPostsDto.timeFilter && FilterPostsDto.timeFilter !== 'anytime') {
       const now = new Date();

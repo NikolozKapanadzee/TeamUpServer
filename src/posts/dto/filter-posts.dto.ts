@@ -1,4 +1,5 @@
-import { IsIn, IsOptional, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsArray, IsIn, IsOptional, IsString } from 'class-validator';
 
 export class FilterPostsDto {
   @IsOptional()
@@ -6,8 +7,18 @@ export class FilterPostsDto {
   city: string;
 
   @IsOptional()
-  @IsString()
-  position: string;
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return [value];
+    }
+    if (Array.isArray(value)) {
+      return value;
+    }
+    return undefined;
+  })
+  @IsArray()
+  @IsString({ each: true })
+  lookfor: string[];
 
   @IsOptional()
   @IsIn(['24hrs', 'week', 'month', 'anytime'])

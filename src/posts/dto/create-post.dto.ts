@@ -1,8 +1,8 @@
 import {
+  IsArray,
   IsDefined,
   IsEmail,
   IsNotEmpty,
-  IsObject,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -16,10 +16,8 @@ export class CreatePostDto {
   description: string;
   @IsDefined()
   @IsNotEmpty()
-  @IsObject()
-  lookfor: {
-    positions: string[];
-  };
+  @IsArray()
+  lookfor: string[];
   @IsEmail()
   @IsNotEmpty()
   contact: string;
