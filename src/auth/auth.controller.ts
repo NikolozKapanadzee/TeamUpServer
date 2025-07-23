@@ -4,6 +4,7 @@ import { SignUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in.dto';
 import { IsAuthGuard } from './guards/isAuth.guard';
 import { UserId } from 'src/users/decorators/user.decorator';
+import { RecoverPasswordDTO } from './dto/recover-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -23,4 +24,7 @@ export class AuthController {
     console.log(userId);
     return this.authService.getCurrentUser(userId);
   }
+
+  @Post('recover-password')
+  recoverPassword(@Body() recoverPasswordDto: RecoverPasswordDTO) {}
 }

@@ -10,8 +10,9 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Post('/send-email')
-  sendEmail(@Body() body) {
-    return this.appService.sendEmail(body.to, body.subject);
-  }
+  // @Post('/send-email')
+  // sendEmail(@Body() body) {
+  //   const { to, subject, html } = body;
+  //   return this.appService.sendEmail(to, subject, html);
+  // }
 }

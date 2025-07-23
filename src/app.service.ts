@@ -8,8 +8,8 @@ export class AppService {
     return 'This Is TeamUp!';
   }
 
-  async sendEmail(to, subject) {
-    await this.emailService.sendHtmlToSomeone(to, subject);
-    console.log('send email successfully');
-  }
+  // async sendEmail(to: string, subject: string, html: string) {
+  //   await this.emailService.sendHtmlToSomeone(to, subject, html);
+  //   console.log('Email sent successfully');
+  // }
 }

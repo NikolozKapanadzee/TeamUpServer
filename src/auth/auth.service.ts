@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { SignUpDto } from './dto/sign-up.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/users/schema/users.schema';
@@ -7,6 +11,7 @@ import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { SignInDto } from './dto/sign-in.dto';
 import { JwtService } from '@nestjs/jwt';
+import { RecoverPasswordDTO } from './dto/recover-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -25,6 +30,12 @@ export class AuthService {
       password: hashedPassword,
     });
     return { message: 'sign up passed successfully', data: newUser };
+  }
+
+  async recoverPassword(recoverPasswordDto: RecoverPasswordDTO) {
+    const { password, email } = recoverPasswordDto;
+    const user = await this.userModel.find({ email });
+    if (!user) throw new NotFoundException('user not found');
   }
 
   async signIn({ email, password }: SignInDto) {

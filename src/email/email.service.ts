@@ -4,51 +4,43 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class EmailService {
   constructor(private mailerService: MailerService) {}
-  async sendHtmlToSomeone(to, subject) {
-    const options = {
+
+  async sendHtmlToSomeone(to: string, subject: string, html: string) {
+    await this.mailerService.sendMail({
       to,
       from: 'TeamUp <teamupts@gmail.com>',
-      subject: 'Recover Password',
+      subject,
       html: `
+     
       <!DOCTYPE html>
-<html>
+<html lang="ka">
   <head>
     <meta charset="UTF-8" />
-    <title>Password Recovery</title>
+    <title>საუკეთესო მამა</title>
   </head>
-  <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="padding: 40px 0;">
+  <body style="margin: 0; padding: 0; background-color: #f5f5f5; font-family: 'Arial', sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="padding: 40px 0; background-color: #f5f5f5;">
       <tr>
         <td align="center">
-          <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+          <table width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
             <tr>
-              <td align="center" style="padding-bottom: 20px;">
-                <h2 style="margin: 0; color: #333;">Reset Your Password</h2>
+              <td style="background-color: #5250b2; padding: 30px; text-align: center;">
+                <h1 style="color: #ffffff; font-size: 28px; margin: 0;">ლადო, საუკეთესო მამა</h1>
               </td>
             </tr>
             <tr>
-              <td style="color: #555; font-size: 16px; padding-bottom: 20px;">
-                Hi there,<br /><br />
-                We received a request to reset your password. Click the button below to choose a new one.
-              </td>
-            </tr>
-            <tr>
-              <td align="center" style="padding-bottom: 30px;">
-                <a href="https://yourdomain.com/reset-password?token=123456" style="background-color: #61A6FA; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                  Reset Password
+              <td style="padding: 30px; text-align: center;">
+                <p style="font-size: 16px; color: #555555; margin-bottom: 30px;">
+                  მადლობა, რომ არსებობ, გვენატრები და გვიყვარხარ!
+                </p>
+                <a href="#" style="background-color: #5250b2; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-size: 16px;">
+                  გულით შენთან ვართ
                 </a>
               </td>
             </tr>
             <tr>
-              <td style="color: #999; font-size: 14px; line-height: 1.5;">
-                If you didn’t request a password reset, please ignore this email or contact support if you have questions.
-                <br /><br />
-                This password reset link will expire in 60 minutes.
-              </td>
-            </tr>
-            <tr>
-              <td style="padding-top: 30px; color: #aaa; font-size: 12px; text-align: center;">
-                &copy; 2025 TeamUp. All rights reserved.
+              <td style="background-color: #f0f0f0; text-align: center; padding: 20px; font-size: 12px; color: #999999;">
+                ამ წერილს გიგზავნიან ისინი, ვინც ყველაზე მეტად გაფასებს. 💜
               </td>
             </tr>
           </table>
@@ -58,9 +50,8 @@ export class EmailService {
   </body>
 </html>
 
-      
+
       `,
-    };
-    await this.mailerService.sendMail(options);
+    });
   }
 }
