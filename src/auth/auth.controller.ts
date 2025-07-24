@@ -26,5 +26,7 @@ export class AuthController {
   }
 
   @Post('recover-password')
-  recoverPassword(@Body() recoverPasswordDto: RecoverPasswordDTO) {}
+  recoverPassword(@Body() recoverPasswordDto: RecoverPasswordDTO) {
+    return this.authService.recoverPassword(recoverPasswordDto);
+  }
 }
