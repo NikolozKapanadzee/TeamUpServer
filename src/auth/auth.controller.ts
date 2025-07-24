@@ -1,32 +1,38 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in.dto';
 import { IsAuthGuard } from './guards/isAuth.guard';
 import { UserId } from 'src/users/decorators/user.decorator';
-import { RecoverPasswordDTO } from './dto/recover-password.dto';
+import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
+import { ConfirmPasswordResetDto } from './dto/confirm-password-reset.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
   @Post('sign-up')
-  signUp(@Body() SignUpDto: SignUpDto) {
-    return this.authService.signUp(SignUpDto);
+  signUp(@Body() signUpDto: SignUpDto) {
+    return this.authService.signUp(signUpDto);
   }
   @Post('sign-in')
-  signIn(@Body() SignInDto: SignInDto) {
-    return this.authService.signIn(SignInDto);
+  signIn(@Body() signInDto: SignInDto) {
+    return this.authService.signIn(signInDto);
   }
   @Get('current-user')
   @UseGuards(IsAuthGuard)
-  getCurrentuser(@UserId() userId) {
-    console.log(userId);
+  getCurrentUser(@UserId() userId: string) {
     return this.authService.getCurrentUser(userId);
   }
-
-  @Post('recover-password')
-  recoverPassword(@Body() recoverPasswordDto: RecoverPasswordDTO) {
-    return this.authService.recoverPassword(recoverPasswordDto);
+  @Post('request-password-reset')
+  requestPasswordReset(
+    @Body() requestPasswordResetDto: RequestPasswordResetDto,
+  ) {
+    return this.authService.requestPasswordReset(requestPasswordResetDto);
+  }
+  @Post('confirm-password-reset')
+  confirmPasswordReset(
+    @Body() confirmPasswordResetDto: ConfirmPasswordResetDto,
+  ) {
+    return this.authService.confirmPasswordReset(confirmPasswordResetDto);
   }
 }
