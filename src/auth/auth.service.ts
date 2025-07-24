@@ -15,6 +15,7 @@ import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ConfirmPasswordResetDto } from './dto/confirm-password-reset.dto';
 import { EmailService } from 'src/email/email.service';
 import { VerifyEmailDTO } from './dto/verify-email.dto';
+import { ResendOTPDto } from './dto/resend-otp.dto';
 
 @Injectable()
 export class AuthService {
@@ -34,7 +35,6 @@ export class AuthService {
     const otpCode = Math.random().toString().slice(2, 8);
     const validationDate = new Date();
     validationDate.setTime(validationDate.getTime() + 3 * 60 * 1000);
-    console.log(validationDate, 'validationDate');
     const newUser = await this.userModel.create({
       email,
       password: hashedPassword,
@@ -57,15 +57,44 @@ export class AuthService {
     if (user.OTPCode !== otpCode)
       throw new BadRequestException('invalid otp code provided');
 
-    // await this.userModel.updateOne(_id: user._id), {
-    //   '$set':
-    // }
+    await this.userModel.updateOne(
+      { _id: user._id },
+      {
+        $set: { OTPCode: null, OTPValidationDate: null, verified: true },
+      },
+    );
+    const payload = {
+      id: user._id,
+    };
+    const token = this.jwtService.sign(payload, { expiresIn: '1h' });
+    return { token, verify: 'ok' };
+  }
+
+  async resendOTPCode({ email }: ResendOTPDto) {
+    const user = await this.userModel.findOne({ email });
+    if (!user) {
+      throw new NotFoundException('user not found');
+    }
+    const otpCode = Math.random().toString().slice(2, 8);
+    const validationDate = new Date();
+    validationDate.setTime(validationDate.getTime() + 3 * 60 * 1000);
+
+    await this.userModel.updateOne(
+      { _id: user._id },
+      {
+        $set: { OTPCode: otpCode, OTPValidationDate: validationDate },
+      },
+    );
+    await this.emailService.sendOtpCodeToClient(email, otpCode);
+    return {
+      message: 'ok',
+    };
   }
 
   async signIn({ email, password }: SignInDto) {
     const existUser = await this.userModel
       .findOne({ email })
-      .select('password');
+      .select('password verified');
     if (!existUser) {
       throw new BadRequestException('Invalid credentials');
     }
@@ -73,6 +102,7 @@ export class AuthService {
     if (!isPasswordEqual) {
       throw new BadRequestException('Invalid credentials');
     }
+    console.log(existUser, 'existuser');
     if (!existUser.verified) {
       throw new BadRequestException('you have to verify first');
     }

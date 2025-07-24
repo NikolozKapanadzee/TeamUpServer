@@ -6,6 +6,8 @@ import { IsAuthGuard } from './guards/isAuth.guard';
 import { UserId } from 'src/users/decorators/user.decorator';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ConfirmPasswordResetDto } from './dto/confirm-password-reset.dto';
+import { VerifyEmailDTO } from './dto/verify-email.dto';
+import { ResendOTPDto } from './dto/resend-otp.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -13,6 +15,14 @@ export class AuthController {
   @Post('sign-up')
   signUp(@Body() signUpDto: SignUpDto) {
     return this.authService.signUp(signUpDto);
+  }
+  @Post('verify-email')
+  verifyEmail(@Body() { email, otpCode }: VerifyEmailDTO) {
+    return this.authService.verifyEmail({ email, otpCode });
+  }
+  @Post('resend-verification-code')
+  resendOTPCode(@Body() { email }: ResendOTPDto) {
+    return this.authService.resendOTPCode({ email });
   }
   @Post('sign-in')
   signIn(@Body() signInDto: SignInDto) {
