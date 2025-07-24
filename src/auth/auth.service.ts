@@ -14,6 +14,8 @@ import { JwtService } from '@nestjs/jwt';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ConfirmPasswordResetDto } from './dto/confirm-password-reset.dto';
 import { EmailService } from 'src/email/email.service';
+import { VerifyEmailDTO } from './dto/verify-email.dto';
+import { ResendOTPDto } from './dto/resend-otp.dto';
 
 @Injectable()
 export class AuthService {
@@ -29,23 +31,80 @@ export class AuthService {
       throw new BadRequestException('User already exists');
     }
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    const otpCode = Math.random().toString().slice(2, 8);
+    const validationDate = new Date();
+    validationDate.setTime(validationDate.getTime() + 3 * 60 * 1000);
     const newUser = await this.userModel.create({
       email,
       password: hashedPassword,
+      OTPCode: otpCode,
+      OTPValidationDate: validationDate,
     });
-    return { message: 'Sign up completed successfully', data: newUser };
+
+    await this.emailService.sendOtpCodeToClient(email, otpCode);
+    return { message: 'check email for continue verification' };
+  }
+
+  async verifyEmail({ email, otpCode }: VerifyEmailDTO) {
+    const user = await this.userModel.findOne({ email });
+    if (!user) throw new BadRequestException('user not found');
+    if (user.verified)
+      throw new BadRequestException('user is already verified');
+    if (new Date(user.OTPValidationDate as string) < new Date()) {
+      throw new BadRequestException('OTP code expired');
+    }
+    if (user.OTPCode !== otpCode)
+      throw new BadRequestException('invalid otp code provided');
+
+    await this.userModel.updateOne(
+      { _id: user._id },
+      {
+        $set: { OTPCode: null, OTPValidationDate: null, verified: true },
+      },
+    );
+    const payload = {
+      id: user._id,
+    };
+    const token = this.jwtService.sign(payload, { expiresIn: '1h' });
+    return { token, verify: 'ok' };
+  }
+
+  async resendOTPCode({ email }: ResendOTPDto) {
+    const user = await this.userModel.findOne({ email });
+    if (!user) {
+      throw new NotFoundException('user not found');
+    }
+    const otpCode = Math.random().toString().slice(2, 8);
+    const validationDate = new Date();
+    validationDate.setTime(validationDate.getTime() + 3 * 60 * 1000);
+
+    await this.userModel.updateOne(
+      { _id: user._id },
+      {
+        $set: { OTPCode: otpCode, OTPValidationDate: validationDate },
+      },
+    );
+    await this.emailService.sendOtpCodeToClient(email, otpCode);
+    return {
+      message: 'ok',
+    };
   }
 
   async signIn({ email, password }: SignInDto) {
     const existUser = await this.userModel
       .findOne({ email })
-      .select('password');
+      .select('password verified');
     if (!existUser) {
       throw new BadRequestException('Invalid credentials');
     }
     const isPasswordEqual = await bcrypt.compare(password, existUser.password);
     if (!isPasswordEqual) {
       throw new BadRequestException('Invalid credentials');
+    }
+    console.log(existUser, 'existuser');
+    if (!existUser.verified) {
+      throw new BadRequestException('you have to verify first');
     }
     const payload = {
       id: existUser._id,
@@ -97,7 +156,7 @@ export class AuthService {
         resetPasswordExpires: { $gt: new Date() },
       })
       .select('password resetPasswordToken resetPasswordExpires');
-
+    console.log(user);
     if (!user) {
       throw new BadRequestException('Invalid or expired reset token');
     }

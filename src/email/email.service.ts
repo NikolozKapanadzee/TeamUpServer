@@ -40,4 +40,51 @@ export class EmailService {
     `;
     await this.sendHtmlToSomeone(to, 'Password Reset Request', html);
   }
+
+  async sendOtpCodeToClient(to: string, otpCode: string) {
+    const subject = 'OTP Code';
+    const html = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <title>OTP Verification</title>
+    </head>
+    <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #ffffff;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; padding: 40px 0;">
+        <tr>
+          <td align="center">
+            <table width="600" cellpadding="0" cellspacing="0" border="0" style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+              <tr>
+                <td style="background-color: #5353C6; color: white; padding: 20px; text-align: center; font-size: 24px; font-weight: bold;">
+                  Your OTP Code
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 30px; color: #333333; background-color: #ffffff; text-align: center;">
+                  <p style="font-size: 16px; margin-bottom: 20px;">
+                    Please use the following OTP code to continue:
+                  </p>
+                  <p style="font-size: 32px; font-weight: bold; color: #5353C6; margin: 0;">
+                    ${otpCode}
+                  </p>
+                  <p style="font-size: 14px; margin-top: 25px; color: #555555;">
+                    This code is valid for <strong>3 minutes</strong>. Do not share it with anyone.
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td style="background-color: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #888888;">
+                  If you didn’t request this code, please ignore this email.
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+    await this.sendHtmlToSomeone(to, subject, html);
+  }
 }
