@@ -149,14 +149,25 @@ export class AuthService {
   }
 
   async confirmPasswordReset({ token, newPassword }: ConfirmPasswordResetDto) {
-    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+    let cleanToken = token;
+    if (token.includes('&') || token.includes('?')) {
+      cleanToken = token.split(/[&?]/)[0];
+    }
+    const isValidHex = /^[a-f0-9]{64}$/i.test(cleanToken);
+    if (!isValidHex) {
+      throw new BadRequestException('Invalid token format');
+    }
+    const hashedToken = crypto
+      .createHash('sha256')
+      .update(cleanToken)
+      .digest('hex');
     const user = await this.userModel
       .findOne({
         resetPasswordToken: hashedToken,
         resetPasswordExpires: { $gt: new Date() },
       })
       .select('password resetPasswordToken resetPasswordExpires');
-    console.log(user);
+
     if (!user) {
       throw new BadRequestException('Invalid or expired reset token');
     }
