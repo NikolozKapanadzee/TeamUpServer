@@ -14,6 +14,7 @@ import { JwtService } from '@nestjs/jwt';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ConfirmPasswordResetDto } from './dto/confirm-password-reset.dto';
 import { EmailService } from 'src/email/email.service';
+import { VerifyEmailDTO } from './dto/verify-email.dto';
 
 @Injectable()
 export class AuthService {
@@ -29,11 +30,36 @@ export class AuthService {
       throw new BadRequestException('User already exists');
     }
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    const otpCode = Math.random().toString().slice(2, 8);
+    const validationDate = new Date();
+    validationDate.setTime(validationDate.getTime() + 3 * 60 * 1000);
+    console.log(validationDate, 'validationDate');
     const newUser = await this.userModel.create({
       email,
       password: hashedPassword,
+      OTPCode: otpCode,
+      OTPValidationDate: validationDate,
     });
-    return { message: 'Sign up completed successfully', data: newUser };
+
+    await this.emailService.sendOtpCodeToClient(email, otpCode);
+    return { message: 'check email for continue verification' };
+  }
+
+  async verifyEmail({ email, otpCode }: VerifyEmailDTO) {
+    const user = await this.userModel.findOne({ email });
+    if (!user) throw new BadRequestException('user not found');
+    if (user.verified)
+      throw new BadRequestException('user is already verified');
+    if (new Date(user.OTPValidationDate as string) < new Date()) {
+      throw new BadRequestException('OTP code expired');
+    }
+    if (user.OTPCode !== otpCode)
+      throw new BadRequestException('invalid otp code provided');
+
+    // await this.userModel.updateOne(_id: user._id), {
+    //   '$set':
+    // }
   }
 
   async signIn({ email, password }: SignInDto) {
@@ -46,6 +72,9 @@ export class AuthService {
     const isPasswordEqual = await bcrypt.compare(password, existUser.password);
     if (!isPasswordEqual) {
       throw new BadRequestException('Invalid credentials');
+    }
+    if (!existUser.verified) {
+      throw new BadRequestException('you have to verify first');
     }
     const payload = {
       id: existUser._id,
@@ -97,7 +126,7 @@ export class AuthService {
         resetPasswordExpires: { $gt: new Date() },
       })
       .select('password resetPasswordToken resetPasswordExpires');
-
+    console.log(user);
     if (!user) {
       throw new BadRequestException('Invalid or expired reset token');
     }
