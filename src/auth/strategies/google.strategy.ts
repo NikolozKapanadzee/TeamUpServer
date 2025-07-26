@@ -13,9 +13,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
     });
   }
   validate(accessToken, refreshToken, data, done) {
-    console.log(accessToken, 'accessToken');
-    console.log(refreshToken, 'refreshToken');
-    console.log(data, 'data');
-    done(null, data);
+    done(null, {
+      email: data.email,
+    });
   }
 }
