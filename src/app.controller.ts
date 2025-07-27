@@ -11,7 +11,7 @@ export class AppController {
   }
 
   // @Post('/send-email')
-  // sendEmail(@Body() body) {
+  // sendEmail(@Body() body: { to: string; subject: string; html: string }) {
   //   const { to, subject, html } = body;
   //   return this.appService.sendEmail(to, subject, html);
   // }
