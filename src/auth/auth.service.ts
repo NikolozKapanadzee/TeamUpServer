@@ -118,7 +118,7 @@ export class AuthService {
     if (!existUser)
       existUser = await this.userModel.create({ email, verified: true });
     const payload = {
-      userId: existUser._id,
+      id: existUser._id,
     };
     const token = this.jwtService.sign(payload, { expiresIn: '1h' });
     return {

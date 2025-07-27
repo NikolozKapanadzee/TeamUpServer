@@ -33,12 +33,17 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(GoogleAuth)
   async googleCallBack(@Req() req, @Res() res: Response) {
-    console.log(req.user, 'req.user');
-    const { redirectUrl, token } = await this.authService.continueWithGoogle(
-      req.user,
-    );
-    res.cookie('accessToken', token, { maxAge: 60 * 60 * 1000 });
-    res.redirect(redirectUrl);
+    console.log('req.user:', req.user);
+    try {
+      const { redirectUrl, token } = await this.authService.continueWithGoogle(
+        req.user,
+      );
+      console.log('token', token);
+      const redirectWithToken = `${redirectUrl}?token=${token}`;
+      res.redirect(redirectWithToken);
+    } catch (error) {
+      console.error('OAuth callback error:', error);
+    }
   }
   @Post('verify-email')
   verifyEmail(@Body() { email, otpCode }: VerifyEmailDTO) {
