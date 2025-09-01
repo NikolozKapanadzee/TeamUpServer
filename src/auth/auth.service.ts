@@ -63,11 +63,11 @@ export class AuthService {
         $set: { OTPCode: null, OTPValidationDate: null, verified: true },
       },
     );
-    const payload = {
-      id: user._id,
-    };
-    const token = this.jwtService.sign(payload, { expiresIn: '1h' });
-    return { token, verify: 'ok' };
+    // const payload = {
+    //   id: user._id,
+    // };
+    // const token = this.jwtService.sign(payload, { expiresIn: '1h' });
+    return { verify: 'ok' };
   }
 
   async resendOTPCode({ email }: ResendOTPDto) {
