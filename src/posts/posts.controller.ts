@@ -15,6 +15,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { IsAuthGuard } from 'src/auth/guards/isAuth.guard';
 import { UserId } from 'src/users/decorators/user.decorator';
 import { FilterPostsDto } from './dto/filter-posts.dto';
+import { QueryParamsDTO } from './dto/query-params.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -27,8 +28,10 @@ export class PostsController {
   }
 
   @Get()
-  findAll() {
-    return this.postsService.findAll();
+  findAll(@Query() queryParamsDto: QueryParamsDTO) {
+    const { page, take } = queryParamsDto;
+    console.log(page, take, 'query');
+    return this.postsService.findAll(queryParamsDto);
   }
 
   @Get('search')

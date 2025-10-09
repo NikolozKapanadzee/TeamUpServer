@@ -11,6 +11,7 @@ import { isValidObjectId, Model } from 'mongoose';
 import { Post } from './schema/post.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/users/schema/users.schema';
+import { QueryParamsDTO } from './dto/query-params.dto';
 
 @Injectable()
 export class PostsService {
@@ -45,8 +46,11 @@ export class PostsService {
       post: createdPost,
     };
   }
-  async findAll() {
-    return this.postModel.find();
+  async findAll({ page, take }: QueryParamsDTO) {
+    const skip = (page - 1) * take;
+    const data = await this.postModel.find().skip(skip).limit(take);
+    const total = await this.postModel.countDocuments();
+    return { data, total };
   }
 
   async findWithFilters(FilterPostsDto: FilterPostsDto) {
