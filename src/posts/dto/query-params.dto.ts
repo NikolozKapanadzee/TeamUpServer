@@ -10,5 +10,5 @@ export class QueryParamsDTO {
   @IsOptional()
   @Transform(({ value }) => Math.min(Number(value), 30))
   @IsNumber()
-  take: number = 30;
+  take: number = 15;
 }
