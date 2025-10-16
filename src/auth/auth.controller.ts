@@ -38,7 +38,7 @@ export class AuthController {
       const { redirectUrl, token } = await this.authService.continueWithGoogle(
         req.user,
       );
-      console.log('token', token);
+      console.log('token:', token);
       const redirectWithToken = `${redirectUrl}?token=${token}`;
       res.redirect(redirectWithToken);
     } catch (error) {

@@ -98,6 +98,11 @@ export class AuthService {
     if (!existUser) {
       throw new BadRequestException('Invalid credentials');
     }
+    if (!existUser.password) {
+      throw new BadRequestException(
+        'Account registered via Google. Please sign in with Google.',
+      );
+    }
     const isPasswordEqual = await bcrypt.compare(password, existUser.password);
     if (!isPasswordEqual) {
       throw new BadRequestException('Invalid credentials');
