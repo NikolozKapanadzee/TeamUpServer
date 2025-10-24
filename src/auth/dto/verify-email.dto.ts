@@ -6,7 +6,7 @@ export class VerifyEmailDTO {
   @IsNotEmpty()
   @IsEmail()
   email: string;
-  @ApiProperty({ example: 607475, required: true })
+  @ApiProperty({ example: 607475, required: true, type: Number })
   @IsNotEmpty()
   @IsString()
   otpCode: string;

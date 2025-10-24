@@ -3,12 +3,12 @@ import { Transform } from 'class-transformer';
 import { IsNumber, IsOptional } from 'class-validator';
 
 export class QueryParamsDTO {
-  @ApiProperty({ example: 2 })
+  @ApiProperty({ example: 2, type: Number })
   @IsOptional()
   @Transform(({ value }) => Math.max(Number(value), 1))
   @IsNumber()
   page: number = 1;
-  @ApiProperty({ example: 15 })
+  @ApiProperty({ example: 15, type: Number })
   @IsOptional()
   @Transform(({ value }) => Math.min(Number(value), 30))
   @IsNumber()

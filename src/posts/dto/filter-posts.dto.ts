@@ -7,7 +7,7 @@ export class FilterPostsDto {
   @IsOptional()
   @IsString()
   city: string;
-  @ApiProperty({ example: 'Web Developer' })
+  @ApiProperty({ example: 'Web Developer', type: Array })
   @IsOptional()
   @Transform(({ value }) => {
     if (typeof value === 'string') {

@@ -24,6 +24,7 @@ export class CreatePostDto {
   @ApiProperty({
     example: ['Backend Developer', 'Frontend Developer'],
     required: true,
+    type: Array,
   })
   @IsDefined()
   @IsNotEmpty()
