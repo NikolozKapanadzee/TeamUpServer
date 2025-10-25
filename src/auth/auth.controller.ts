@@ -18,10 +18,22 @@ import { VerifyEmailDTO } from './dto/verify-email.dto';
 import { ResendOTPDto } from './dto/resend-otp.dto';
 import { GoogleAuth } from './guards/google.guard';
 import { Response } from 'express';
+import { ApiBadRequestResponse, ApiResponse } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+  @ApiResponse({
+    status: 201,
+    schema: {
+      example: 'check email for verification',
+    },
+  })
+  @ApiBadRequestResponse({
+    schema: {
+      example: 'user already exists',
+    },
+  })
   @Post('sign-up')
   signUp(@Body() signUpDto: SignUpDto) {
     return this.authService.signUp(signUpDto);
