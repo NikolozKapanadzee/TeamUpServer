@@ -115,7 +115,7 @@ export class AuthService {
       id: existUser._id,
     };
     const token = this.jwtService.sign(payload, { expiresIn: '1h' });
-    return { token };
+    return { token, message: 'ok' };
   }
 
   async continueWithGoogle({ email }) {
