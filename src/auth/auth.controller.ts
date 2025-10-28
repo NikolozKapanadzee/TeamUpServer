@@ -19,6 +19,7 @@ import { ResendOTPDto } from './dto/resend-otp.dto';
 import { GoogleAuth } from './guards/google.guard';
 import { Response } from 'express';
 import { ApiBadRequestResponse, ApiResponse } from '@nestjs/swagger';
+import { error } from 'console';
 
 @Controller('auth')
 export class AuthController {
@@ -41,7 +42,6 @@ export class AuthController {
   @Get('google')
   @UseGuards(GoogleAuth)
   continueWithGoogle() {}
-
   @Get('google/callback')
   @UseGuards(GoogleAuth)
   async googleCallBack(@Req() req, @Res() res: Response) {
@@ -57,6 +57,53 @@ export class AuthController {
       console.error('OAuth callback error:', error);
     }
   }
+
+  @ApiResponse({
+    status: 201,
+    schema: {
+      example: 'ok',
+    },
+  })
+  @ApiBadRequestResponse({
+    content: {
+      'application/json': {
+        examples: {
+          userNotFound: {
+            summary: 'User not found',
+            value: {
+              statusCode: 400,
+              message: 'user not found',
+              error: 'Bad Request',
+            },
+          },
+          userAlreadyVerified: {
+            summary: 'User is already verified',
+            value: {
+              statusCode: 400,
+              message: 'user is already verified',
+              error: 'Bad Request',
+            },
+          },
+          invalidOtp: {
+            summary: 'Invalid OTP code',
+            value: {
+              statusCode: 400,
+              message: 'invalid otp code provided',
+              error: 'Bad Request',
+            },
+          },
+          otpExpired: {
+            summary: 'OTP expired',
+            value: {
+              statusCode: 400,
+              message: 'OTP code expired',
+              error: 'Bad Request',
+            },
+          },
+        },
+      },
+    },
+  })
   @Post('verify-email')
   verifyEmail(@Body() { email, otpCode }: VerifyEmailDTO) {
     return this.authService.verifyEmail({ email, otpCode });
