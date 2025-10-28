@@ -127,7 +127,7 @@ export class AuthService {
     };
     const token = this.jwtService.sign(payload, { expiresIn: '1h' });
     return {
-      redirectUrl: `${process.env.FRONTEND_URL}`,
+      redirectUrl: `http://localhost:3000`,
       token,
     };
   }
