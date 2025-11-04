@@ -51,7 +51,8 @@ export class AuthController {
         req.user,
       );
       console.log('token:', token);
-      const redirectWithToken = `${redirectUrl}?token=${token}`;
+      const redirectWithToken = `${redirectUrl}/auth/callback?token=${token}`;
+      // const redirectWithToken = `${redirectUrl}?token=${token}`;
       res.redirect(redirectWithToken);
     } catch (error) {
       console.error('OAuth callback error:', error);
