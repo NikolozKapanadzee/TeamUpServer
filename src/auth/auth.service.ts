@@ -118,18 +118,15 @@ export class AuthService {
     return { token, message: 'ok' };
   }
 
-  async continueWithGoogle({ email }) {
+  async continueWithGoogle({ email }): Promise<{ token: string }> {
     let existUser = await this.userModel.findOne({ email });
     if (!existUser)
       existUser = await this.userModel.create({ email, verified: true });
-    const payload = {
-      id: existUser._id,
-    };
+
+    const payload = { id: existUser._id };
     const token = this.jwtService.sign(payload, { expiresIn: '1h' });
-    return {
-      redirectUrl: process.env.FRONTEND_URL,
-      token,
-    };
+
+    return { token };
   }
 
   async getCurrentUser(userId: string) {

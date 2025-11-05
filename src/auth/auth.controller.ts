@@ -19,7 +19,6 @@ import { ResendOTPDto } from './dto/resend-otp.dto';
 import { GoogleAuth } from './guards/google.guard';
 import { Response } from 'express';
 import { ApiBadRequestResponse, ApiResponse } from '@nestjs/swagger';
-import { error } from 'console';
 
 @Controller('auth')
 export class AuthController {
@@ -42,21 +41,21 @@ export class AuthController {
   @Get('google')
   @UseGuards(GoogleAuth)
   continueWithGoogle() {}
+
   @Get('google/callback')
   @UseGuards(GoogleAuth)
-  async googleCallBack(@Req() req, @Res() res: Response) {
-    console.log('req.user:', req.user);
-    try {
-      const { redirectUrl, token } = await this.authService.continueWithGoogle(
-        req.user,
-      );
-      console.log('token:', token);
-      const redirectWithToken = `${redirectUrl}/auth/callback?token=${token}`;
-      // const redirectWithToken = `${redirectUrl}?token=${token}`;
-      res.redirect(redirectWithToken);
-    } catch (error) {
-      console.error('OAuth callback error:', error);
-    }
+  async googleCallback(@Req() req, @Res() res: Response) {
+    const { token } = await this.authService.continueWithGoogle(req.user);
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 60 * 60 * 1000,
+      path: '/',
+    });
+
+    return res.redirect(`${process.env.FRONTEND_URL}?token=${token}`);
   }
 
   @ApiResponse({
